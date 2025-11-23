@@ -7,6 +7,7 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -46,6 +47,10 @@ public class ProfileActivity extends AppCompatActivity {
 
         initializeViews();
         setupListeners();
+        setupBottomNavigation();
+        setupTopNavigation();
+        // Highlight the menu tab since we're in ProfileActivity
+        navigateToTab(4); // TAB_MENU = 4
         loadUserData();
     }
 
@@ -371,6 +376,111 @@ public class ProfileActivity extends AppCompatActivity {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser == null) {
             redirectToLogin();
+        }
+    }
+
+    protected void setupBottomNavigation() {
+        LinearLayout tabHome = findViewById(R.id.tab_home);
+        LinearLayout tabDescuentos = findViewById(R.id.tab_descuentos);
+        LinearLayout tabTienda = findViewById(R.id.tab_tienda);
+        LinearLayout tabCuadrado = findViewById(R.id.tab_cuadrado);
+        LinearLayout tabMenu = findViewById(R.id.tab_menu);
+
+        // Constantes para los índices de tabs
+        final int TAB_HOME = 0;
+        final int TAB_DESCUENTOS = 1;
+        final int TAB_TIENDA = 2;
+        final int TAB_CUADRADO = 3;
+        final int TAB_MENU = 4;
+
+        View.OnClickListener listener = v -> {
+            int tabIndex = -1;
+
+            int id = v.getId();
+
+            if (id == R.id.tab_home) {
+                tabIndex = TAB_HOME;
+                startActivity(new Intent(this, MainActivity.class));
+                finish();
+            } else if (id == R.id.tab_descuentos) {
+                tabIndex = TAB_DESCUENTOS;
+
+            } else if (id == R.id.tab_tienda) {
+                tabIndex = TAB_TIENDA;
+                startActivity(new Intent(this, CarritoActivity.class));
+                finish();
+            } else if (id == R.id.tab_cuadrado) {
+                tabIndex = TAB_CUADRADO;
+
+            } else if (id == R.id.tab_menu) {
+                tabIndex = TAB_MENU;
+                // Ya estamos en ProfileActivity, no necesitamos navegar
+            }
+
+            if (tabIndex != -1) {
+                navigateToTab(tabIndex);
+            }
+        };
+
+        if (tabHome != null) tabHome.setOnClickListener(listener);
+        if (tabDescuentos != null) tabDescuentos.setOnClickListener(listener);
+        if (tabTienda != null) tabTienda.setOnClickListener(listener);
+        if (tabCuadrado != null) tabCuadrado.setOnClickListener(listener);
+        if (tabMenu != null) tabMenu.setOnClickListener(listener);
+    }
+
+    protected void navigateToTab(int tabIndex) {
+        resetTabs();
+
+        LinearLayout tabHome = findViewById(R.id.tab_home);
+        LinearLayout tabDescuentos = findViewById(R.id.tab_descuentos);
+        LinearLayout tabTienda = findViewById(R.id.tab_tienda);
+        LinearLayout tabCuadrado = findViewById(R.id.tab_cuadrado);
+        LinearLayout tabMenu = findViewById(R.id.tab_menu);
+
+        switch (tabIndex) {
+            case 0:
+                if (tabHome != null) tabHome.setAlpha(1f);
+                break;
+            case 1:
+                if (tabDescuentos != null) tabDescuentos.setAlpha(1f);
+                break;
+            case 2:
+                if (tabTienda != null) tabTienda.setAlpha(1f);
+                break;
+            case 3:
+                if (tabCuadrado != null) tabCuadrado.setAlpha(1f);
+                break;
+            case 4:
+                if (tabMenu != null) tabMenu.setAlpha(1f);
+                break;
+        }
+    }
+
+    protected void resetTabs() {
+        LinearLayout tabHome = findViewById(R.id.tab_home);
+        LinearLayout tabDescuentos = findViewById(R.id.tab_descuentos);
+        LinearLayout tabTienda = findViewById(R.id.tab_tienda);
+        LinearLayout tabCuadrado = findViewById(R.id.tab_cuadrado);
+        LinearLayout tabMenu = findViewById(R.id.tab_menu);
+
+        if (tabHome != null) tabHome.setAlpha(0.6f);
+        if (tabDescuentos != null) tabDescuentos.setAlpha(0.6f);
+        if (tabTienda != null) tabTienda.setAlpha(0.6f);
+        if (tabCuadrado != null) tabCuadrado.setAlpha(0.6f);
+        if (tabMenu != null) tabMenu.setAlpha(0.6f);
+    }
+
+    protected void setupTopNavigation() {
+        android.widget.ImageView ivProfile = findViewById(R.id.iv_profile);
+        if (ivProfile != null) {
+            // Si ya estamos en ProfileActivity, no hacer nada al hacer clic
+            ivProfile.setOnClickListener(v -> {
+                // Ya estamos en el perfil, no necesitamos navegar
+            });
+            // Make it clickable
+            ivProfile.setClickable(true);
+            ivProfile.setFocusable(true);
         }
     }
 }
