@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="8dp"
+    android:background="@android:color/white"
+    android:elevation="4dp"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:gravity="center">
+
+        <!-- Payment Logo/Icon -->
+        <ImageView
+            android:id="@+id/iv_payment_logo"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:minHeight="100dp"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="false"
+            android:background="#F5F5F5"
+            android:contentDescription="Payment Logo" />
+
+        <!-- Promotion Text -->
+        <TextView
+            android:id="@+id/tv_promotion_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="25% OFF utilizando Mercado pago via NFC."
+            android:textSize="12sp"
+            android:textColor="@color/black"
+            android:gravity="center"
+            android:layout_marginTop="8dp"
+            android:lineSpacingMultiplier="1.2"
+            android:maxLines="3"
+            android:ellipsize="end" />
+
+    </LinearLayout>
+
+</LinearLayout>
+

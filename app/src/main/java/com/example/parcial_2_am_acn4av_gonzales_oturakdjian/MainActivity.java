@@ -15,6 +15,7 @@ import java.util.TimerTask;
 
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -46,10 +47,11 @@ public class MainActivity extends BaseActivity {
     private ExecutorService executorService;
     private Handler mainHandler;
 
-    private int[] images = {
-            R.drawable.image1,
-            R.drawable.image2
-    };
+    private List<String> carouselImageUrls = Arrays.asList(
+            "https://images.ctfassets.net/j0994xxhz671/7mZrf2CjapMDYb2lmndwBI/41fc3747041b10de2ebe79a7b7244d8c/Screenshot_2025-06-02_112612.png",
+            "https://www.elcomercio.com/wp-content/uploads/2021/10/bayer.jpg",
+            "https://www.periodicopublicidad.com/media/lapublicidad/images/2025/04/15/2025041507111790978.jpg"
+    );
 
     private int currentPage = 0;
     private Timer timer;
@@ -214,7 +216,7 @@ public class MainActivity extends BaseActivity {
         layoutDots = findViewById(R.id.layoutDots);
 
 
-        carouselAdapter = new CarouselAdapter(this, images);
+        carouselAdapter = new CarouselAdapter(this, carouselImageUrls);
         viewPager.setAdapter(carouselAdapter);
 
 
@@ -245,7 +247,7 @@ public class MainActivity extends BaseActivity {
 
         layoutDots.removeAllViews();
 
-        ImageView[] dots = new ImageView[images.length];
+        ImageView[] dots = new ImageView[carouselImageUrls.size()];
 
         for (int i = 0; i < dots.length; i++) {
             dots[i] = new ImageView(this);
@@ -281,7 +283,7 @@ public class MainActivity extends BaseActivity {
         final Handler handler = new Handler();
         final Runnable update = new Runnable() {
             public void run() {
-                if (currentPage == images.length - 1) {
+                if (currentPage == carouselImageUrls.size() - 1) {
                     currentPage = 0;
                 } else {
                     currentPage++;

@@ -99,7 +99,10 @@ public class BaseActivity extends AppCompatActivity {
                 }
             } else if (id == R.id.tab_descuentos) {
                 tabIndex = TAB_DESCUENTOS;
-
+                if (!(this instanceof DescuentosActivity)) {
+                    startActivity(new Intent(this, DescuentosActivity.class));
+                    finish();
+                }
             } else if (id == R.id.tab_tienda) {
                 tabIndex = TAB_TIENDA;
                 if (!(this instanceof CarritoActivity)) {

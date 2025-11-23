@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="#F5F5F5">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ofertas Especiales"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_marginBottom="16dp"
+            android:gravity="center" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- First Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="2"
+                android:layout_marginBottom="8dp">
+
+                <!-- Product Offer Card (Top Left) -->
+                <include
+                    android:id="@+id/product_card"
+                    layout="@layout/item_offer_product"
+                    android:layout_width="0dp"
+                    android:layout_height="280dp"
+                    android:layout_weight="1" />
+
+                <!-- Mercado Pago Promotion Card (Top Right) -->
+                <include
+                    android:id="@+id/mercado_pago_card"
+                    layout="@layout/item_offer_payment"
+                    android:layout_width="0dp"
+                    android:layout_height="280dp"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
+
+            <!-- Second Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <!-- Naranja X Promotion Card (Bottom Left) -->
+                <include
+                    android:id="@+id/naranja_x_card"
+                    layout="@layout/item_offer_payment"
+                    android:layout_width="0dp"
+                    android:layout_height="280dp"
+                    android:layout_weight="1" />
+
+                <!-- VISA Promotion Card (Bottom Right) -->
+                <include
+                    android:id="@+id/visa_card"
+                    layout="@layout/item_offer_payment"
+                    android:layout_width="0dp"
+                    android:layout_height="280dp"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>
+

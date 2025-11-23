@@ -8,20 +8,24 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import androidx.viewpager.widget.PagerAdapter;
 
+import com.bumptech.glide.Glide;
+
+import java.util.List;
+
 public class CarouselAdapter extends PagerAdapter {
     private Context context;
-    private int[] images;
+    private List<String> imageUrls;
     private LayoutInflater layoutInflater;
 
-    public CarouselAdapter(Context context, int[] images) {
+    public CarouselAdapter(Context context, List<String> imageUrls) {
         this.context = context;
-        this.images = images;
+        this.imageUrls = imageUrls;
         this.layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
     public int getCount() {
-        return images.length;
+        return imageUrls.size();
     }
 
     @Override
@@ -34,7 +38,15 @@ public class CarouselAdapter extends PagerAdapter {
         View itemView = layoutInflater.inflate(R.layout.carousel_item, container, false);
 
         ImageView imageView = itemView.findViewById(R.id.iv_carousel_image);
-        imageView.setImageResource(images[position]);
+        
+        // Load image from URL using Glide
+        String imageUrl = imageUrls.get(position);
+        Glide.with(context)
+                .load(imageUrl)
+                .placeholder(R.drawable.ic_launcher_background)
+                .error(R.drawable.ic_launcher_background)
+                .centerCrop()
+                .into(imageView);
 
         container.addView(itemView);
         return itemView;
