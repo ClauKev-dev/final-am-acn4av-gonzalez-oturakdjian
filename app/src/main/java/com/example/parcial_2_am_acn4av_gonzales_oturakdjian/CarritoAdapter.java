@@ -8,6 +8,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+
 import java.util.List;
 
 public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.CarritoViewHolder> {
@@ -30,7 +33,20 @@ public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.CarritoV
     @Override
     public void onBindViewHolder(CarritoViewHolder holder, int position) {
         Product producto = carrito.get(position);
-        holder.ivProduct.setImageResource(producto.getImageResId());
+        
+        // Load image from URL using Glide
+        if (producto.getImageUrl() != null && !producto.getImageUrl().isEmpty()) {
+            Glide.with(holder.itemView.getContext())
+                    .load(producto.getImageUrl())
+                    .placeholder(R.drawable.ic_launcher_background)
+                    .error(R.drawable.ic_launcher_background)
+                    .centerCrop()
+                    .into(holder.ivProduct);
+        } else {
+            // Fallback to default image if no URL
+            holder.ivProduct.setImageResource(R.drawable.ic_launcher_background);
+        }
+        
         holder.tvName.setText(producto.getName());
         holder.tvPrice.setText(producto.getPriceFormatted());
         holder.tvQuantity.setText(String.valueOf(producto.getQuantity()));

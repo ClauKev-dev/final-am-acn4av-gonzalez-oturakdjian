@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.viewpager.widget.ViewPager;
@@ -15,6 +16,17 @@ import java.util.TimerTask;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.InputStream;
+import java.io.IOException;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 
@@ -28,7 +40,11 @@ public class MainActivity extends BaseActivity {
     private CarouselAdapter carouselAdapter;
     private TextView tvCartCount;
     private int cartCount = 0;
-
+    private RecyclerView recyclerProducts;
+    private ProductAdapter productAdapter;
+    private List<Product> productList;
+    private ExecutorService executorService;
+    private Handler mainHandler;
 
     private int[] images = {
             R.drawable.image1,
@@ -50,27 +66,140 @@ public class MainActivity extends BaseActivity {
         tvCartCount = findViewById(R.id.tv_cart_count);
         setupCarousel();
 
-        RecyclerView recyclerProducts = findViewById(R.id.recyclerProducts);
-
-
+        // Initialize RecyclerView
+        recyclerProducts = findViewById(R.id.recyclerProducts);
         recyclerProducts.setLayoutManager(new GridLayoutManager(this, 2));
 
+        // Initialize product list
+        productList = new ArrayList<>();
 
-        List<Product> productList = new ArrayList<>();
-        productList.add(new Product(R.drawable.image3, "Curitas", 3500.0));
-        productList.add(new Product(R.drawable.image4, "Jarabe para la tos", 4200.0));
-        productList.add(new Product(R.drawable.image5, "Tafirol para espasmos", 8000.0));
-        productList.add(new Product(R.drawable.image6, "Ibuprofeno 400", 6000.0));
-
-        ProductAdapter adapter = new ProductAdapter(this, productList, product -> {
-
+        // Initialize adapter
+        productAdapter = new ProductAdapter(this, productList, product -> {
             CarritoManager.agregarProducto(product);
-
-
             actualizarCartCount();
         });
-        recyclerProducts.setAdapter(adapter);
+        recyclerProducts.setAdapter(productAdapter);
 
+        // Initialize executor and handler for background tasks
+        executorService = Executors.newSingleThreadExecutor();
+        mainHandler = new Handler(getMainLooper());
+
+        // Load products from JSON URL
+        loadProductsFromJson();
+    }
+
+    private void loadProductsFromJson() {
+        // URL corregida sin /refs/heads/
+        String jsonUrl = "https://raw.githubusercontent.com/ClauKev-dev/parcial-2-am-acn4av-gonzalez-oturakdjian/main/products.json";
+        
+        executorService.execute(() -> {
+            HttpURLConnection connection = null;
+            BufferedReader reader = null;
+            
+            try {
+                URL url = new URL(jsonUrl);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
+                connection.setRequestProperty("Accept", "application/json");
+                connection.setConnectTimeout(10000);
+                connection.setReadTimeout(10000);
+                connection.connect();
+                
+                int responseCode = connection.getResponseCode();
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    StringBuilder stringBuilder = new StringBuilder();
+                    String line;
+                    
+                    while ((line = reader.readLine()) != null) {
+                        stringBuilder.append(line);
+                    }
+                    
+                    String jsonString = stringBuilder.toString();
+                    parseJsonAndUpdateUI(jsonString);
+                } else {
+                    // Si falla la URL, intentar cargar desde assets como fallback
+                    mainHandler.post(() -> {
+                        Toast.makeText(MainActivity.this, "Error al cargar desde URL (Código " + responseCode + "). Cargando desde assets...", Toast.LENGTH_SHORT).show();
+                    });
+                    loadProductsFromAssets();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                // Si hay excepción, intentar cargar desde assets como fallback
+                mainHandler.post(() -> {
+                    Toast.makeText(MainActivity.this, "Error al cargar desde URL. Cargando desde assets...", Toast.LENGTH_SHORT).show();
+                });
+                loadProductsFromAssets();
+            } finally {
+                if (connection != null) {
+                    connection.disconnect();
+                }
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+    }
+    
+    private void loadProductsFromAssets() {
+        executorService.execute(() -> {
+            try {
+                // Intentar leer desde assets
+                InputStream inputStream = getAssets().open("products.json");
+                int size = inputStream.available();
+                byte[] buffer = new byte[size];
+                inputStream.read(buffer);
+                inputStream.close();
+                
+                // Convertir a string
+                String jsonString = new String(buffer, "UTF-8");
+                parseJsonAndUpdateUI(jsonString);
+            } catch (IOException e) {
+                // Si también falla assets, mostrar error
+                mainHandler.post(() -> {
+                    Toast.makeText(MainActivity.this, "Error al cargar productos: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+                e.printStackTrace();
+            }
+        });
+    }
+    
+    private void parseJsonAndUpdateUI(String jsonString) {
+        try {
+            // Parse JSON
+            JSONArray jsonArray = new JSONArray(jsonString);
+            List<Product> newProductList = new ArrayList<>();
+            
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                
+                Product product = new Product();
+                product.setId(jsonObject.optString("id", String.valueOf(i)));
+                product.setName(jsonObject.getString("name"));
+                product.setPrice(jsonObject.getDouble("price"));
+                product.setImageUrl(jsonObject.optString("imageUrl", ""));
+                
+                newProductList.add(product);
+            }
+            
+            // Update UI on main thread
+            mainHandler.post(() -> {
+                productList.clear();
+                productList.addAll(newProductList);
+                productAdapter.notifyDataSetChanged();
+            });
+        } catch (JSONException e) {
+            mainHandler.post(() -> {
+                Toast.makeText(MainActivity.this, "Error al parsear JSON: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            });
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -175,6 +304,9 @@ public class MainActivity extends BaseActivity {
         super.onDestroy();
         if (timer != null) {
             timer.cancel();
+        }
+        if (executorService != null) {
+            executorService.shutdown();
         }
     }
 

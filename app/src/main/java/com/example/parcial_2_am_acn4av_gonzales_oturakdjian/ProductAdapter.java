@@ -11,6 +11,8 @@ import android.widget.Toast;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.List;
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> {
@@ -38,12 +40,24 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     @Override
     public void onBindViewHolder(ProductViewHolder holder, int position) {
         Product product = productList.get(position);
-        holder.ivProduct.setImageResource(product.getImageResId());
+        
+        // Load image from URL using Glide
+        if (product.getImageUrl() != null && !product.getImageUrl().isEmpty()) {
+            Glide.with(context)
+                    .load(product.getImageUrl())
+                    .placeholder(R.drawable.ic_launcher_background)
+                    .error(R.drawable.ic_launcher_background)
+                    .centerCrop()
+                    .into(holder.ivProduct);
+        } else {
+            // Fallback to default image if no URL
+            holder.ivProduct.setImageResource(R.drawable.ic_launcher_background);
+        }
+        
         holder.tvName.setText(product.getName());
         holder.tvPrice.setText(product.getPriceFormatted());
 
         holder.btnAddToCart.setOnClickListener(v -> {
-
             Toast.makeText(context, product.getName() + " agregado al carrito", Toast.LENGTH_SHORT).show();
             if (listener != null) {
                 listener.onAddToCart(product);
