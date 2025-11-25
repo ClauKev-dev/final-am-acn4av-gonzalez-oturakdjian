@@ -48,6 +48,7 @@ public class MainActivity extends BaseActivity {
     private ProductAdapter productAdapter;
     private List<Product> productList;
     private List<Product> allProductsList; // Store all products for search filtering
+    private TextView tvNoResults;
     private ExecutorService executorService;
     private Handler mainHandler;
 
@@ -76,6 +77,9 @@ public class MainActivity extends BaseActivity {
         // Initialize RecyclerView
         recyclerProducts = findViewById(R.id.recyclerProducts);
         recyclerProducts.setLayoutManager(new GridLayoutManager(this, 2));
+        
+        // Initialize no results message
+        tvNoResults = findViewById(R.id.tv_no_results);
 
         // Initialize product lists
         productList = new ArrayList<>();
@@ -279,20 +283,36 @@ public class MainActivity extends BaseActivity {
 
     private void filterProducts(String searchQuery) {
         if (allProductsList == null || allProductsList.isEmpty()) {
+            if (tvNoResults != null) {
+                tvNoResults.setVisibility(View.GONE);
+            }
             return;
         }
         
         productList.clear();
+        boolean hasSearchQuery = searchQuery != null && !searchQuery.trim().isEmpty();
         
-        if (searchQuery == null || searchQuery.trim().isEmpty()) {
+        if (!hasSearchQuery) {
             // Show all products if search is empty
             productList.addAll(allProductsList);
+            if (tvNoResults != null) {
+                tvNoResults.setVisibility(View.GONE);
+            }
         } else {
             // Filter products by name (case insensitive)
             String query = searchQuery.toLowerCase().trim();
             for (Product product : allProductsList) {
                 if (product.getName() != null && product.getName().toLowerCase().contains(query)) {
                     productList.add(product);
+                }
+            }
+            
+            // Show "sin resultados" if no products match the search
+            if (tvNoResults != null) {
+                if (productList.isEmpty()) {
+                    tvNoResults.setVisibility(View.VISIBLE);
+                } else {
+                    tvNoResults.setVisibility(View.GONE);
                 }
             }
         }
