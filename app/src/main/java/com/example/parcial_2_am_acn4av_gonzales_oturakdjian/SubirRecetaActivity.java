@@ -30,7 +30,6 @@ public class SubirRecetaActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_SELECT_FILE = 1001;
     
     private Button btnSeleccionarArchivo;
-    private Button btnSubirReceta;
     private Button btnEliminarArchivo;
     private LinearLayout llFileInfo;
     private TextView tvNombreArchivo;
@@ -64,9 +63,17 @@ public class SubirRecetaActivity extends AppCompatActivity {
         navigateToTab(4); // TAB_MENU = 4
     }
 
+    private void initializeViews() {
+        btnSeleccionarArchivo = findViewById(R.id.btn_seleccionar_archivo);
+        btnEliminarArchivo = findViewById(R.id.btn_eliminar_archivo);
+        llFileInfo = findViewById(R.id.ll_file_info);
+        tvNombreArchivo = findViewById(R.id.tv_nombre_archivo);
+        ivPreview = findViewById(R.id.iv_preview);
+        llPdfIcon = findViewById(R.id.ll_pdf_icon);
+    }
+
     private void setupListeners() {
         btnSeleccionarArchivo.setOnClickListener(v -> seleccionarArchivo());
-        btnSubirReceta.setOnClickListener(v -> subirReceta());
         btnEliminarArchivo.setOnClickListener(v -> eliminarArchivo());
     }
 
@@ -110,7 +117,6 @@ public class SubirRecetaActivity extends AppCompatActivity {
         
         llFileInfo.setVisibility(View.VISIBLE);
         tvNombreArchivo.setText(selectedFileName);
-        btnSubirReceta.setEnabled(true);
         
         if (isImageFile) {
             // Show image preview
@@ -125,13 +131,15 @@ public class SubirRecetaActivity extends AppCompatActivity {
             ivPreview.setVisibility(View.GONE);
             llPdfIcon.setVisibility(View.VISIBLE);
         }
+        
+        // Automatically upload the file when selected
+        subirReceta();
     }
 
     private void eliminarArchivo() {
         selectedFileUri = null;
         selectedFileName = null;
         llFileInfo.setVisibility(View.GONE);
-        btnSubirReceta.setEnabled(false);
         ivPreview.setVisibility(View.GONE);
         llPdfIcon.setVisibility(View.GONE);
     }
@@ -149,9 +157,9 @@ public class SubirRecetaActivity extends AppCompatActivity {
             return;
         }
         
-        // Disable button during upload
-        btnSubirReceta.setEnabled(false);
-        btnSubirReceta.setText("Subiendo...");
+        // Disable select button during upload
+        btnSeleccionarArchivo.setEnabled(false);
+        btnSeleccionarArchivo.setText("Subiendo...");
         
         // Create storage reference
         String userId = currentUser.getUid();
@@ -189,19 +197,20 @@ public class SubirRecetaActivity extends AppCompatActivity {
                                     
                                     // Reset UI
                                     eliminarArchivo();
-                                    btnSubirReceta.setText("Subir Receta");
+                                    btnSeleccionarArchivo.setText("Seleccionar Archivo (PDF o Imagen)");
+                                    btnSeleccionarArchivo.setEnabled(true);
                                 })
                                 .addOnFailureListener(e -> {
                                     Toast.makeText(this, "Error al guardar la información: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                    btnSubirReceta.setEnabled(true);
-                                    btnSubirReceta.setText("Subir Receta");
+                                    btnSeleccionarArchivo.setEnabled(true);
+                                    btnSeleccionarArchivo.setText("Seleccionar Archivo (PDF o Imagen)");
                                 });
                     });
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Error al subir el archivo: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    btnSubirReceta.setEnabled(true);
-                    btnSubirReceta.setText("Subir Receta");
+                    btnSeleccionarArchivo.setEnabled(true);
+                    btnSeleccionarArchivo.setText("Seleccionar Archivo (PDF o Imagen)");
                 });
     }
 
