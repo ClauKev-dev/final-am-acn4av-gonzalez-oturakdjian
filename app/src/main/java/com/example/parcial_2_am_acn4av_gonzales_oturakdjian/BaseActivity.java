@@ -169,18 +169,64 @@ public class BaseActivity extends AppCompatActivity {
         
         // Setup search icon click to toggle search bar
         if (ivSearch != null && etSearch != null) {
+            android.widget.LinearLayout llHeader = findViewById(R.id.ll_header);
+            android.view.ViewGroup parent = (android.view.ViewGroup) etSearch.getParent();
+            
             ivSearch.setOnClickListener(v -> {
                 if (etSearch.getVisibility() == View.VISIBLE) {
-                    // Hide search bar
-                    etSearch.setVisibility(View.GONE);
+                    // Hide search bar with slide-out animation (left to right)
+                    int width = parent != null ? parent.getWidth() : 1000;
+                    android.view.animation.TranslateAnimation slideOut = new android.view.animation.TranslateAnimation(
+                            0, width, 0, 0);
+                    slideOut.setDuration(300);
+                    slideOut.setFillAfter(false);
+                    slideOut.setAnimationListener(new android.view.animation.Animation.AnimationListener() {
+                        @Override
+                        public void onAnimationStart(android.view.animation.Animation animation) {}
+                        
+                        @Override
+                        public void onAnimationEnd(android.view.animation.Animation animation) {
+                            etSearch.setVisibility(View.GONE);
+                            etSearch.clearAnimation();
+                            if (llHeader != null) {
+                                llHeader.setVisibility(View.VISIBLE);
+                            }
+                        }
+                        
+                        @Override
+                        public void onAnimationRepeat(android.view.animation.Animation animation) {}
+                    });
+                    etSearch.startAnimation(slideOut);
                     etSearch.clearFocus();
                     // Clear search if this is MainActivity
                     if (this instanceof MainActivity) {
                         ((MainActivity) this).clearSearch();
                     }
                 } else {
-                    // Show search bar
+                    // Hide header first
+                    if (llHeader != null) {
+                        llHeader.setVisibility(View.GONE);
+                    }
+                    // Show search bar with slide-in animation (right to left)
                     etSearch.setVisibility(View.VISIBLE);
+                    int width = parent != null ? parent.getWidth() : 1000;
+                    android.view.animation.TranslateAnimation slideIn = new android.view.animation.TranslateAnimation(
+                            width, 0, 0, 0);
+                    slideIn.setDuration(300);
+                    slideIn.setFillAfter(false);
+                    slideIn.setAnimationListener(new android.view.animation.Animation.AnimationListener() {
+                        @Override
+                        public void onAnimationStart(android.view.animation.Animation animation) {}
+                        
+                        @Override
+                        public void onAnimationEnd(android.view.animation.Animation animation) {
+                            etSearch.clearAnimation();
+                        }
+                        
+                        @Override
+                        public void onAnimationRepeat(android.view.animation.Animation animation) {}
+                    });
+                    etSearch.startAnimation(slideIn);
                     etSearch.requestFocus();
                     // Show keyboard
                     android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
