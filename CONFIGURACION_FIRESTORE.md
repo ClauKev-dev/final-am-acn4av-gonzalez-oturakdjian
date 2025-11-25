@@ -56,6 +56,12 @@ service cloud.firestore {
         // Permitir lectura y escritura de pedidos solo si el usuario está autenticado y es su propio pedido
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
+      
+      // Reglas para los métodos de pago del usuario
+      match /paymentMethods/{paymentMethodId} {
+        // Permitir lectura y escritura de métodos de pago solo si el usuario está autenticado y es su propio método
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
     }
   }
 }

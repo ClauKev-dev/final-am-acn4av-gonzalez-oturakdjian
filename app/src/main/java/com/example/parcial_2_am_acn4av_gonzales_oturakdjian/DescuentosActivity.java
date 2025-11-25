@@ -115,7 +115,7 @@ public class DescuentosActivity extends BaseActivity {
             }
             
             if (text != null) {
-                text.setText("25% OFF utilizando Mercado pago via NFC.");
+                text.setText("25% OFF utilizando Mercado pago.");
             }
         }
 
@@ -137,7 +137,7 @@ public class DescuentosActivity extends BaseActivity {
             }
             
             if (text != null) {
-                text.setText("25% OFF utilizando Naranja x via NFC.");
+                text.setText("25% OFF utilizando Naranja x.");
             }
         }
 

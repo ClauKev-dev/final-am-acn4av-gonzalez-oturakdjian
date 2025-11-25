@@ -13,6 +13,10 @@ public class Order {
     private String status; // "en_curso", "completado", "cancelado"
     private String cardNumber; // Últimos 4 dígitos
     private String cardHolder;
+    private String paymentMethodId; // ID of the payment method used
+    private String paymentMethodType; // "debit", "credit", "mercado_pago"
+    private String paymentMethodBrand; // Card brand (Visa, Mastercard, Naranja X, etc.)
+    private int installments; // Number of installments (0 if not applicable)
     @ServerTimestamp
     private Timestamp createdAt;
     private Timestamp updatedAt;
@@ -100,6 +104,38 @@ public class Order {
 
     public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getPaymentMethodId() {
+        return paymentMethodId;
+    }
+
+    public void setPaymentMethodId(String paymentMethodId) {
+        this.paymentMethodId = paymentMethodId;
+    }
+
+    public String getPaymentMethodType() {
+        return paymentMethodType;
+    }
+
+    public void setPaymentMethodType(String paymentMethodType) {
+        this.paymentMethodType = paymentMethodType;
+    }
+
+    public String getPaymentMethodBrand() {
+        return paymentMethodBrand;
+    }
+
+    public void setPaymentMethodBrand(String paymentMethodBrand) {
+        this.paymentMethodBrand = paymentMethodBrand;
+    }
+
+    public int getInstallments() {
+        return installments;
+    }
+
+    public void setInstallments(int installments) {
+        this.installments = installments;
     }
 }
 

@@ -100,6 +100,15 @@
         </LinearLayout>
     </LinearLayout>
 
+    <CheckBox
+        android:id="@+id/cb_save_payment_method"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Guardar este método de pago"
+        android:checked="true"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp" />
+
     <TextView
         android:id="@+id/tv_total_pago"
         android:layout_width="wrap_content"

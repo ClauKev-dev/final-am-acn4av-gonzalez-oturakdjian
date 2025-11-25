@@ -8,6 +8,7 @@ import java.util.Locale;
 
 public class DiscountHelper {
     private static final double SENIOR_DISCOUNT_PERCENTAGE = 0.15; // 15%
+    private static final double PAYMENT_METHOD_DISCOUNT_PERCENTAGE = 0.25; // 25%
     private static final int WOMAN_AGE_THRESHOLD = 60;
     private static final int MAN_AGE_THRESHOLD = 65;
 
@@ -94,6 +95,110 @@ public class DiscountHelper {
             return total * SENIOR_DISCOUNT_PERCENTAGE;
         }
         return 0.0;
+    }
+
+    /**
+     * Checks if a payment method qualifies for discount
+     * @param paymentMethod PaymentMethod object
+     * @return true if payment method has discount
+     */
+    public static boolean paymentMethodHasDiscount(PaymentMethod paymentMethod) {
+        if (paymentMethod == null) {
+            return false;
+        }
+        
+        String type = paymentMethod.getType();
+        String brand = paymentMethod.getCardBrand();
+        
+        // Mercado Pago has 25% discount
+        if (PaymentMethod.TYPE_MERCADO_PAGO.equals(type)) {
+            return true;
+        }
+        
+        // Naranja X has 25% discount
+        if (brand != null && brand.equalsIgnoreCase("Naranja X")) {
+            return true;
+        }
+        
+        return false;
+    }
+
+    /**
+     * Applies payment method discount to total
+     * @param total Original total
+     * @param paymentMethod PaymentMethod object
+     * @return Discounted total
+     */
+    public static double applyPaymentMethodDiscount(double total, PaymentMethod paymentMethod) {
+        if (paymentMethodHasDiscount(paymentMethod)) {
+            return total * (1 - PAYMENT_METHOD_DISCOUNT_PERCENTAGE);
+        }
+        return total;
+    }
+
+    /**
+     * Gets payment method discount amount
+     * @param total Original total
+     * @param paymentMethod PaymentMethod object
+     * @return Discount amount
+     */
+    public static double getPaymentMethodDiscountAmount(double total, PaymentMethod paymentMethod) {
+        if (paymentMethodHasDiscount(paymentMethod)) {
+            return total * PAYMENT_METHOD_DISCOUNT_PERCENTAGE;
+        }
+        return 0.0;
+    }
+
+    /**
+     * Checks if payment method supports installments
+     * @param paymentMethod PaymentMethod object
+     * @return true if supports installments
+     */
+    public static boolean supportsInstallments(PaymentMethod paymentMethod) {
+        if (paymentMethod == null) {
+            return false;
+        }
+        
+        // Visa credit cards support 6 installments with no interest
+        return PaymentMethod.TYPE_CREDIT.equals(paymentMethod.getType()) &&
+               "Visa".equalsIgnoreCase(paymentMethod.getCardBrand());
+    }
+
+    /**
+     * Applies both senior discount and payment method discount
+     * @param total Original total
+     * @param qualifiesForSeniorDiscount Whether user qualifies for senior discount
+     * @param paymentMethod PaymentMethod object
+     * @return Final discounted total
+     */
+    public static double applyAllDiscounts(double total, boolean qualifiesForSeniorDiscount, PaymentMethod paymentMethod) {
+        double discountedTotal = total;
+        
+        // Apply senior discount first
+        if (qualifiesForSeniorDiscount) {
+            discountedTotal = applyDiscount(discountedTotal, true);
+        }
+        
+        // Apply payment method discount
+        if (paymentMethodHasDiscount(paymentMethod)) {
+            discountedTotal = applyPaymentMethodDiscount(discountedTotal, paymentMethod);
+        }
+        
+        return discountedTotal;
+    }
+
+    /**
+     * Gets total discount amount (senior + payment method)
+     * @param total Original total
+     * @param qualifiesForSeniorDiscount Whether user qualifies for senior discount
+     * @param paymentMethod PaymentMethod object
+     * @return Total discount amount
+     */
+    public static double getTotalDiscountAmount(double total, boolean qualifiesForSeniorDiscount, PaymentMethod paymentMethod) {
+        double seniorDiscount = qualifiesForSeniorDiscount ? getDiscountAmount(total, true) : 0.0;
+        double totalAfterSenior = total - seniorDiscount;
+        double paymentDiscount = getPaymentMethodDiscountAmount(totalAfterSenior, paymentMethod);
+        return seniorDiscount + paymentDiscount;
     }
 }
 

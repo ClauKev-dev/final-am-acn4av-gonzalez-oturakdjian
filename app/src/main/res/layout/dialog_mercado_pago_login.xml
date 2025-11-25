@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Iniciar Sesión en Mercado Pago"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ingresa tu email o número de teléfono registrado en tu perfil"
+        android:textSize="14sp"
+        android:textColor="#666"
+        android:layout_marginBottom="24dp" />
+
+    <!-- Email or Phone Input -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Email o Teléfono"
+        android:textSize="14sp"
+        android:layout_marginBottom="4dp" />
+
+    <EditText
+        android:id="@+id/et_mp_email_phone"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:hint="Email o teléfono"
+        android:inputType="text"
+        android:padding="12dp"
+        android:background="@drawable/input_field_gray"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Password Input -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Contraseña"
+        android:textSize="14sp"
+        android:layout_marginBottom="4dp" />
+
+    <EditText
+        android:id="@+id/et_mp_password"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:hint="Contraseña"
+        android:inputType="textPassword"
+        android:padding="12dp"
+        android:background="@drawable/input_field_gray"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:id="@+id/tv_mp_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#FF0000"
+        android:textSize="12sp"
+        android:visibility="gone"
+        android:layout_marginBottom="8dp" />
+
+    <CheckBox
+        android:id="@+id/cb_save_mp_method"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Guardar este método de pago"
+        android:checked="true"
+        android:layout_marginBottom="16dp" />
+
+</LinearLayout>
+
