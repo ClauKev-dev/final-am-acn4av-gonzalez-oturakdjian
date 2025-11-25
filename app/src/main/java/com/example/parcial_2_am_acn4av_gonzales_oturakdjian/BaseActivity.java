@@ -154,6 +154,9 @@ public class BaseActivity extends AppCompatActivity {
 
     protected void setupTopNavigation() {
         android.widget.ImageView ivProfile = findViewById(R.id.iv_profile);
+        android.widget.ImageView ivSearch = findViewById(R.id.iv_search);
+        android.widget.EditText etSearch = findViewById(R.id.et_search);
+        
         if (ivProfile != null) {
             ivProfile.setOnClickListener(v -> {
                 Intent intent = new Intent(this, ProfileActivity.class);
@@ -162,6 +165,32 @@ public class BaseActivity extends AppCompatActivity {
             // Make it clickable
             ivProfile.setClickable(true);
             ivProfile.setFocusable(true);
+        }
+        
+        // Setup search icon click to toggle search bar
+        if (ivSearch != null && etSearch != null) {
+            ivSearch.setOnClickListener(v -> {
+                if (etSearch.getVisibility() == View.VISIBLE) {
+                    // Hide search bar
+                    etSearch.setVisibility(View.GONE);
+                    etSearch.clearFocus();
+                    // Clear search if this is MainActivity
+                    if (this instanceof MainActivity) {
+                        ((MainActivity) this).clearSearch();
+                    }
+                } else {
+                    // Show search bar
+                    etSearch.setVisibility(View.VISIBLE);
+                    etSearch.requestFocus();
+                    // Show keyboard
+                    android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
+                    if (imm != null) {
+                        imm.showSoftInput(etSearch, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT);
+                    }
+                }
+            });
+            ivSearch.setClickable(true);
+            ivSearch.setFocusable(true);
         }
     }
 

@@ -2,7 +2,10 @@ package com.example.parcial_2_am_acn4av_gonzales_oturakdjian;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -44,6 +47,7 @@ public class MainActivity extends BaseActivity {
     private RecyclerView recyclerProducts;
     private ProductAdapter productAdapter;
     private List<Product> productList;
+    private List<Product> allProductsList; // Store all products for search filtering
     private ExecutorService executorService;
     private Handler mainHandler;
 
@@ -73,8 +77,9 @@ public class MainActivity extends BaseActivity {
         recyclerProducts = findViewById(R.id.recyclerProducts);
         recyclerProducts.setLayoutManager(new GridLayoutManager(this, 2));
 
-        // Initialize product list
+        // Initialize product lists
         productList = new ArrayList<>();
+        allProductsList = new ArrayList<>();
 
         // Initialize adapter
         productAdapter = new ProductAdapter(this, productList, product -> {
@@ -230,6 +235,8 @@ public class MainActivity extends BaseActivity {
             
             // Update UI on main thread
             mainHandler.post(() -> {
+                allProductsList.clear();
+                allProductsList.addAll(newProductList);
                 productList.clear();
                 productList.addAll(newProductList);
                 productAdapter.notifyDataSetChanged();
@@ -246,6 +253,59 @@ public class MainActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
         actualizarCartCount();
+    }
+
+    @Override
+    protected void setupTopNavigation() {
+        super.setupTopNavigation();
+        
+        // Setup search functionality
+        EditText etSearch = findViewById(R.id.et_search);
+        if (etSearch != null) {
+            etSearch.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    filterProducts(s.toString());
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {}
+            });
+        }
+    }
+
+    private void filterProducts(String searchQuery) {
+        if (allProductsList == null || allProductsList.isEmpty()) {
+            return;
+        }
+        
+        productList.clear();
+        
+        if (searchQuery == null || searchQuery.trim().isEmpty()) {
+            // Show all products if search is empty
+            productList.addAll(allProductsList);
+        } else {
+            // Filter products by name (case insensitive)
+            String query = searchQuery.toLowerCase().trim();
+            for (Product product : allProductsList) {
+                if (product.getName() != null && product.getName().toLowerCase().contains(query)) {
+                    productList.add(product);
+                }
+            }
+        }
+        
+        productAdapter.notifyDataSetChanged();
+    }
+
+    public void clearSearch() {
+        EditText etSearch = findViewById(R.id.et_search);
+        if (etSearch != null) {
+            etSearch.setText("");
+        }
+        filterProducts("");
     }
 
     private void setupCarousel() {
