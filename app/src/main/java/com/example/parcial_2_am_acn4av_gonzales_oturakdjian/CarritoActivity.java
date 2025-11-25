@@ -2,9 +2,14 @@ package com.example.parcial_2_am_acn4av_gonzales_oturakdjian;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextWatcher;
+import android.text.style.StrikethroughSpan;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -126,8 +131,22 @@ public class CarritoActivity extends BaseActivity {
                         double discount = DiscountHelper.getDiscountAmount(total, qualifies);
                         
                         if (qualifies) {
-                            tvTotal.setText(String.format(Locale.getDefault(), 
-                                "Total: $%.2f (Descuento 15%%: -$%.2f)", finalTotal, discount));
+                            // Create text with original price crossed out in red, then final price
+                            String originalPriceText = String.format(Locale.getDefault(), "$%.2f", total);
+                            String finalPriceText = String.format(Locale.getDefault(), " $%.2f", finalTotal);
+                            String fullText = "Total: " + originalPriceText + finalPriceText;
+                            
+                            SpannableString spannable = new SpannableString(fullText);
+                            
+                            // Find the position of the original price
+                            int originalPriceStart = fullText.indexOf(originalPriceText);
+                            int originalPriceEnd = originalPriceStart + originalPriceText.length();
+                            
+                            // Apply strikethrough and red color to original price
+                            spannable.setSpan(new StrikethroughSpan(), originalPriceStart, originalPriceEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            spannable.setSpan(new ForegroundColorSpan(Color.RED), originalPriceStart, originalPriceEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            
+                            tvTotal.setText(spannable);
                         } else {
                             tvTotal.setText(String.format(Locale.getDefault(), "Total: $%.2f", finalTotal));
                         }
