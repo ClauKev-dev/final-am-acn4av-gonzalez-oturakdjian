@@ -2,6 +2,7 @@ package com.example.final_am_acn4av_gonzalez_oturakdjian;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -14,16 +15,29 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class LootboxActivity extends BaseActivity {
 
-    private static final String KEY_PRODUCT_NAME = "Llave";
-    private static final double KEY_PRICE = 2500.0;
-    private static final String KEY_IMAGE_URL = ""; // Can be set later if needed
+    private static final String KEY_PRODUCT_ID = "key-lootbox";
+    private static final String KEY_PRODUCT_NAME_FALLBACK = "Llave de Lootbox";
+    private static final double KEY_PRICE_FALLBACK = 2500.0;
+    private static final String KEY_IMAGE_URL_FALLBACK = "https://i.imgur.com/SMNYpRE.png";
     private static final String LOOTBOX_IMAGE_URL = "https://i.imgur.com/SMNYpRE.png";
+    private static final String PRODUCTS_JSON_URL = "https://raw.githubusercontent.com/ClauKev-dev/final-am-acn4av-gonzalez-oturakdjian/refs/heads/main/products.json";
 
     private RecyclerView recyclerLootboxProducts;
     private LootboxProductAdapter lootboxProductAdapter;
@@ -31,6 +45,9 @@ public class LootboxActivity extends BaseActivity {
     private Button btnAbrirCaja;
     private FirebaseFirestore db;
     private int keyCount = 0;
+    private ExecutorService keyExecutor;
+    private Handler mainHandler;
+    private Product cachedKeyProduct;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,8 +59,12 @@ public class LootboxActivity extends BaseActivity {
 
         navigateToTab(3); // TAB_CUADRADO = 3
 
+        keyExecutor = Executors.newSingleThreadExecutor();
+        mainHandler = new Handler(getMainLooper());
+
         db = FirebaseFirestore.getInstance();
         setupLootboxScreen();
+        preloadKeyProduct();
         loadKeyCount();
     }
 
@@ -96,13 +117,15 @@ public class LootboxActivity extends BaseActivity {
                     return;
                 }
 
-                // Create key product
-                Product keyProduct = new Product(KEY_IMAGE_URL, KEY_PRODUCT_NAME, KEY_PRICE);
+                // Crear producto llave con fallback local (sin depender de red)
+                Product keyProduct = new Product(KEY_IMAGE_URL_FALLBACK, KEY_PRODUCT_NAME_FALLBACK, KEY_PRICE_FALLBACK);
+                keyProduct.setQuantity(1);
+                keyProduct.setId(null); // evitar conflicto de id al sincronizar con Firestore
                 
                 // Add to cart
                 CarritoManager.agregarProducto(keyProduct);
                 
-                Toast.makeText(this, KEY_PRODUCT_NAME + " agregada al carrito", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, KEY_PRODUCT_NAME_FALLBACK + " agregada al carrito", Toast.LENGTH_SHORT).show();
                 
                 // Navigate to cart
                 startActivity(new Intent(this, CarritoActivity.class));
@@ -112,7 +135,6 @@ public class LootboxActivity extends BaseActivity {
         if (btnAbrirCaja != null) {
             btnAbrirCaja.setOnClickListener(v -> {
                 if (keyCount > 0) {
-                    // Future implementation: open lootbox if user has keys
                     Toast.makeText(this, "Función de abrir caja próximamente disponible", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(this, "No tienes llaves disponibles. Compra una llave primero.", Toast.LENGTH_SHORT).show();
@@ -158,6 +180,89 @@ public class LootboxActivity extends BaseActivity {
                 btnAbrirCaja.setBackgroundTintList(android.content.res.ColorStateList.valueOf(getResources().getColor(android.R.color.darker_gray, getTheme())));
             }
         }
+    }
+
+    private void preloadKeyProduct() {
+        keyExecutor.execute(() -> {
+            Product remoteProduct = loadKeyProductFromRemote();
+            if (remoteProduct == null) {
+                remoteProduct = loadKeyProductFromAssets();
+            }
+            Product finalProduct = remoteProduct;
+            mainHandler.post(() -> cachedKeyProduct = finalProduct);
+        });
+    }
+
+    private Product loadKeyProductFromRemote() {
+        HttpURLConnection connection = null;
+        BufferedReader reader = null;
+        try {
+            URL url = new URL(PRODUCTS_JSON_URL);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("User-Agent", "Mozilla/5.0");
+            connection.setRequestProperty("Accept", "application/json");
+            connection.setConnectTimeout(8000);
+            connection.setReadTimeout(8000);
+            connection.connect();
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+                android.util.Log.e("LootboxActivity", "Error HTTP al cargar llave: " + responseCode);
+                return null;
+            }
+
+            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+            return parseKeyProduct(sb.toString());
+        } catch (Exception e) {
+            android.util.Log.e("LootboxActivity", "No se pudo cargar llave desde URL", e);
+            return null;
+        } finally {
+            if (connection != null) connection.disconnect();
+            if (reader != null) {
+                try { reader.close(); } catch (Exception ignored) {}
+            }
+        }
+    }
+
+    private Product loadKeyProductFromAssets() {
+        try (InputStream is = getAssets().open("products.json")) {
+            byte[] buffer = new byte[is.available()];
+            int read = is.read(buffer);
+            if (read <= 0) {
+                throw new IllegalStateException("products.json vacío o no leído");
+            }
+
+            return parseKeyProduct(new String(buffer, StandardCharsets.UTF_8));
+        } catch (Exception e) {
+            android.util.Log.e("LootboxActivity", "No se pudo cargar la llave desde JSON, usando fallback", e);
+        }
+
+        return new Product(KEY_IMAGE_URL_FALLBACK, KEY_PRODUCT_NAME_FALLBACK, KEY_PRICE_FALLBACK);
+    }
+
+    private Product parseKeyProduct(String jsonString) {
+        try {
+            JSONArray arr = new JSONArray(jsonString);
+            for (int i = 0; i < arr.length(); i++) {
+                JSONObject obj = arr.getJSONObject(i);
+                if (KEY_PRODUCT_ID.equalsIgnoreCase(obj.optString("id"))) {
+                    Product p = new Product();
+                    p.setName(obj.optString("name", KEY_PRODUCT_NAME_FALLBACK));
+                    p.setPrice(obj.optDouble("price", KEY_PRICE_FALLBACK));
+                    p.setImageUrl(obj.optString("imageUrl", KEY_IMAGE_URL_FALLBACK));
+                    return p;
+                }
+            }
+        } catch (Exception e) {
+            android.util.Log.e("LootboxActivity", "Error al parsear llave desde JSON", e);
+        }
+        return null;
     }
 }
 

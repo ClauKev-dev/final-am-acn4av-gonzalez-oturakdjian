@@ -37,6 +37,9 @@ import java.util.Map;
 
 public class CarritoActivity extends BaseActivity {
 
+    private static final String KEY_PRODUCT_ID = "key-lootbox";
+    private static final String KEY_PRODUCT_NAME = "Llave de Lootbox";
+
     private RecyclerView recyclerCarrito;
     private TextView tvTotal;
     private Button btnPagar;
@@ -749,7 +752,15 @@ public class CarritoActivity extends BaseActivity {
                     // Count keys in the order and update user's key count
                     int keysInOrder = 0;
                     for (Product product : productosPedido) {
-                        if ("Llave".equals(product.getName())) {
+                        if (product == null) continue;
+
+                        String name = product.getName();
+                        String id = product.getId();
+
+                        boolean isKeyByName = name != null && KEY_PRODUCT_NAME.equalsIgnoreCase(name);
+                        boolean isKeyById = id != null && KEY_PRODUCT_ID.equalsIgnoreCase(id);
+
+                        if (isKeyByName || isKeyById) {
                             keysInOrder += product.getQuantity();
                         }
                     }

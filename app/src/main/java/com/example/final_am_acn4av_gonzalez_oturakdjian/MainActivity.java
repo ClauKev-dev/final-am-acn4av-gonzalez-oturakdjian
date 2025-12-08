@@ -127,7 +127,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private void loadProductsFromJson() {
-        String jsonUrl = "https://raw.githubusercontent.com/ClauKev-dev/parcial-2-am-acn4av-gonzalez-oturakdjian/main/products.json";
+        String jsonUrl = "https://raw.githubusercontent.com/ClauKev-dev/final-am-acn4av-gonzalez-oturakdjian/refs/heads/main/products.json";
         
         executorService.execute(() -> {
             HttpURLConnection connection = null;
@@ -211,12 +211,20 @@ public class MainActivity extends BaseActivity {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                 
+                String productId = jsonObject.optString("id", String.valueOf(i));
+                String productName = jsonObject.optString("name", "");
+
+                // Ocultar llave de lootbox del home
+                if ("key-lootbox".equalsIgnoreCase(productId) || "Llave de Lootbox".equalsIgnoreCase(productName)) {
+                    continue;
+                }
+
                 Product product = new Product();
-                product.setId(jsonObject.optString("id", String.valueOf(i)));
-                product.setName(jsonObject.getString("name"));
+                product.setId(productId);
+                product.setName(productName);
                 product.setPrice(jsonObject.getDouble("price"));
                 product.setImageUrl(jsonObject.optString("imageUrl", ""));
-                
+
                 newProductList.add(product);
             }
 

@@ -34,6 +34,12 @@
     "name": "Aspirina",
     "price": 1800.0,
     "imageUrl": "https://s2.elespanol.com/2018/06/08/ciencia/salud/farmacologia-farmacologia_clinica-salud_313481328_81018057_1706x1280.jpg"
+  },
+  {
+    "id": "key-lootbox",
+    "name": "Llave de Lootbox",
+    "price": 2500.0,
+    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhSiNerJKGXdUkjEOolfOG6LZmQtF_4LpiMg&s"
   }
 ]
 
