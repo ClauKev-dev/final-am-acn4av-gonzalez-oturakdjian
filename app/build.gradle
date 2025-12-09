@@ -6,6 +6,9 @@ plugins {
 android {
     namespace 'com.example.final_am_acn4av_gonzalez_oturakdjian'
     compileSdk 36
+    def localProps = new Properties()
+    localProps.load(new FileInputStream(rootProject.file("local.properties")))
+    def MAPS_API_KEY = localProps.getProperty("MAPS_API_KEY")
 
     defaultConfig {
         applicationId "com.example.final_am_acn4av_gonzalez_oturakdjian"
@@ -15,6 +18,11 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        manifestPlaceholders = [
+                MAPS_API_KEY: MAPS_API_KEY
+
+        ]
     }
 
     buildTypes {
@@ -55,3 +63,4 @@ dependencies {
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
 }
+

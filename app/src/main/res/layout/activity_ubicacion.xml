@@ -80,7 +80,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Av. Corrientes 1234, Buenos Aires, Argentina"
+                        android:text="Av. Corrientes 2037, Buenos Aires, Argentina"
                         android:textColor="@color/text_secondary"
                         android:textSize="16sp"
                         android:gravity="center"
@@ -113,7 +113,7 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Av. Corrientes 1234"
+                            android:text="Av. Corrientes 2037"
                             android:textColor="@color/text_secondary"
                             android:textSize="14sp"
                             android:layout_marginBottom="4dp" />

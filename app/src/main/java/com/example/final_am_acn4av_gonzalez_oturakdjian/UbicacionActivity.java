@@ -23,9 +23,9 @@ public class UbicacionActivity extends AppCompatActivity implements OnMapReadyCa
     private MapView mapView;
     private GoogleMap googleMap;
     
-    // Random address coordinates: Av. Corrientes 1234, Buenos Aires, Argentina
-    private static final double LATITUDE = -34.603722;
-    private static final double LONGITUDE = -58.381592;
+    // Dirección: Av. Corrientes 2037, Buenos Aires, Argentina
+    private static final double LATITUDE = -34.6025;
+    private static final double LONGITUDE = -58.3950;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +55,7 @@ public class UbicacionActivity extends AppCompatActivity implements OnMapReadyCa
         googleMap.addMarker(new MarkerOptions()
                 .position(location)
                 .title("Medi Pocket")
-                .snippet("Av. Corrientes 1234, Buenos Aires"));
+                .snippet("Av. Corrientes 2037, Buenos Aires"));
         
         // Move camera to location
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15f));
