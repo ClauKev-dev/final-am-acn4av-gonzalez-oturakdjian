@@ -248,6 +248,9 @@ public class BaseActivity extends AppCompatActivity {
                 } else if (itemId == R.id.nav_carga_documentos) {
                     Intent intent = new Intent(this, SubirRecetaActivity.class);
                     startActivity(intent);
+                } else if (itemId == R.id.nav_donde_estamos) {
+                    Intent intent = new Intent(this, UbicacionActivity.class);
+                    startActivity(intent);
                 }
 
                 if (drawerLayout != null) {

@@ -16,5 +16,10 @@
         android:icon="@drawable/ic_settings"
         android:title="Configuración" />
     
+    <item
+        android:id="@+id/nav_donde_estamos"
+        android:icon="@drawable/ic_location"
+        android:title="Donde estamos?" />
+    
 </menu>
 

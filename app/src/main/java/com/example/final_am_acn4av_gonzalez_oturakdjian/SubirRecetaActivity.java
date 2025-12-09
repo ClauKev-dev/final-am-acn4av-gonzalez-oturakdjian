@@ -321,6 +321,9 @@ public class SubirRecetaActivity extends AppCompatActivity {
                     Toast.makeText(this, "Configuración - Próximamente", Toast.LENGTH_SHORT).show();
                 } else if (itemId == R.id.nav_carga_documentos) {
                     Toast.makeText(this, "Ya estás en la página de carga de recetas", Toast.LENGTH_SHORT).show();
+                } else if (itemId == R.id.nav_donde_estamos) {
+                    Intent intent = new Intent(this, UbicacionActivity.class);
+                    startActivity(intent);
                 }
                 
                 if (drawerLayout != null) {
