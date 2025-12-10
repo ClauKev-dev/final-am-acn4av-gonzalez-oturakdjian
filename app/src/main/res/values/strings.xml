@@ -40,6 +40,18 @@
     <string name="success_register">¡Registro exitoso! Redirigiendo al login...</string>
     <string name="success_login">¡Bienvenido a MediPocket!</string>
     
+    <!-- Password Reset Strings -->
+    <string name="reset_password_title">Restablecer Contraseña</string>
+    <string name="reset_password_message">Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña</string>
+    <string name="reset_password_email_hint">Correo electrónico</string>
+    <string name="reset_password_send">Enviar</string>
+    <string name="reset_password_cancel">Cancelar</string>
+    <string name="reset_password_success">Se ha enviado un correo para restablecer tu contraseña. Revisa tu bandeja de entrada.</string>
+    <string name="reset_password_error">Error al enviar el correo de restablecimiento</string>
+    <string name="reset_password_error_invalid_email">Correo electrónico inválido</string>
+    <string name="reset_password_error_user_not_found">No existe una cuenta con este correo electrónico</string>
+    <string name="reset_password_error_network">Error de conexión. Verifica tu conexión a internet</string>
+    
     <!-- Profile Strings -->
     <string name="profile_title">Mi Perfil</string>
     <string name="profile_email">Correo electrónico</string>
